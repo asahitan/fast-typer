@@ -170,14 +170,18 @@ body.dark-mode #lives {
 }
 
 /* Add styles for custom time input */
-.custom-time {
+#custom-time, #custom-time-label {
+    margin-left: 30px;
+    color: white;
+}
+
+#custom-time {
     width: 80%;
     margin: 20px 30px;
     padding: 5px;
     font-size: 16px;
 }
 
-/* Existing styles remain unchanged */
 @media screen and (max-width: 480px) {
     .container {
         padding: 20px;
