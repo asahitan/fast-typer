@@ -29,8 +29,12 @@
             <select id="mode-select" class="mode-select">
                 <option value="60s">60-Second Mode</option>
                 <option value="10s">10-Second Challenge Mode</option>
-                <option value="5s-lives">5-Second Challenge Mode with Lives</option> <!-- 5-Second Mode with Lives -->
+                <option value="5s-lives">5-Second Challenge Mode with Lives</option>
+                <option value="custom">Custom Mode</option> <!-- Custom Mode -->
             </select>
+
+            <label for="custom-time">Custom Time (seconds):</label>
+            <input type="number" id="custom-time" class="custom-time" min="1" value="60">
 
             <label for="dark-mode-toggle">Dark Mode:</label>
             <input type="checkbox" id="dark-mode-toggle" class="dark-mode-toggle"> Dark Mode
