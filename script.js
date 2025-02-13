@@ -23,12 +23,11 @@ let timeLeft = 60;
 let totalWordsTyped = 0;
 let isPlaying = false;
 let tps = 0;
-let gameMode = "60s"; // Default mode
+let gameMode = "60s";
 let gameInterval;
-let lives = 3; // Default lives for challenge modes
-let customTime = 60; // Default custom time
+let lives = 3;
+let customTime = 60;
 
-// Map modes to descriptions
 const modeDescriptions = {
     "60s": "60-Second Mode",
     "10s": "10-Second Challenge Mode",
@@ -39,7 +38,6 @@ const modeDescriptions = {
     "custom": "Custom Mode"
 };
 
-// Function to update the mode display and sync the timer
 function updateModeDisplayAndTimer() {
     currentModeDisplay.textContent = `Mode: ${modeDescriptions[gameMode]}`;
     
@@ -90,7 +88,6 @@ function startGame() {
     
     gameMode = modeSelect.value;
     
-    // For custom mode, get the custom time value only once at the start of the game
     if (gameMode === "custom") {
         customTime = parseInt(customTimeInput.value) || 60;
         timeLeft = customTime;
@@ -124,7 +121,7 @@ function handleLifeLoss() {
         clearInterval(gameInterval);
         endGame();
     } else {
-        timeLeft = parseInt(gameMode.split('-')[0].slice(0, 1)); // Reset time in challenge modes
+        timeLeft = parseInt(gameMode.split('-')[0].slice(0, 1));
         nextWord();
     }
 }
@@ -154,9 +151,14 @@ wordInput.addEventListener("input", () => {
         scoreDisplay.textContent = score;
         wordInput.value = "";
         
-        // For custom mode, don't reset time when typing a word
         if (!gameMode.includes("lives") && gameMode !== "custom") {
-            timeLeft = parseInt(gameMode.split('-')[0].slice(0, 1)); // Reset time in challenge modes
+            if (gameMode === "60s") {
+                timeLeft = 60;
+            } else if (gameMode === "10s") {
+                timeLeft = 10;
+            } else {
+                timeLeft = parseInt(gameMode);
+            }
         }
         
         nextWord();
@@ -165,27 +167,20 @@ wordInput.addEventListener("input", () => {
 });
 
 startButton.addEventListener("click", startGame);
-
-// Change mode event listener
 modeSelect.addEventListener("change", () => {
     gameMode = modeSelect.value;
     updateModeDisplayAndTimer();
 });
 
-// Toggle Side Menu
 menuToggle.addEventListener("click", () => {
     sideMenu.style.width = "250px";
 });
 closeMenuButton.addEventListener("click", () => {
     sideMenu.style.width = "0";
 });
-
-// Toggle Dark Mode
 darkModeToggle.addEventListener("change", (e) => {
     document.body.classList.toggle("dark-mode", e.target.checked);
 });
-
-// Disable copy-paste to prevent cheating
 wordInput.addEventListener('paste', (e) => e.preventDefault());
 wordInput.addEventListener('copy', (e) => e.preventDefault());
 wordInput.addEventListener('contextmenu', (e) => e.preventDefault());
