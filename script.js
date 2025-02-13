@@ -138,6 +138,18 @@ function startGame() {
     }, 1000);
 }
 
+// Pause Game When Changing Mode
+modeSelect.addEventListener("change", () => {
+    if (isPlaying) {
+        isPaused = true;
+        clearInterval(gameInterval);
+        startButton.textContent = "Resume Game";
+        startButton.disabled = false;
+    }
+    gameMode = modeSelect.value;
+    updateModeDisplayAndTimer();
+});
+
 // Handle Life Loss
 function handleLifeLoss() {
     lives--;
