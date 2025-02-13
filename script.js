@@ -39,28 +39,25 @@ const modeDescriptions = {
 };
 
 function updateModeDisplayAndTimer() {
-    gameMode = modeSelect.value;
     currentModeDisplay.textContent = `Mode: ${modeDescriptions[gameMode]}`;
     
-    if (gameMode === "custom") {
-        customTimeInput.style.display = "block";
-        customTimeLabel.style.display = "block";
-        customTime = parseInt(customTimeInput.value) || 60;
-        timeLeft = customTime;
-        livesContainer.style.display = "none";
-    } else if (gameMode.includes("lives")) {
-        timeLeft = parseInt(gameMode.split('-')[0]);
-        livesContainer.style.display = "block";
-        livesDisplay.textContent = 3;
-        customTimeInput.style.display = "none";
-        customTimeLabel.style.display = "none";
-    } else {
-        timeLeft = parseInt(gameMode);
-        livesContainer.style.display = "none";
-        customTimeInput.style.display = "none";
-        customTimeLabel.style.display = "none";
+    switch (gameMode) {
+        case "60s":
+            timeLeft = 60;
+            break;
+        case "10s":
+            timeLeft = 10;
+            break;
+        case "custom":
+            customTime = parseInt(customTimeInput.value) || 60;
+            timeLeft = customTime;
+            break;
+        default:
+            timeLeft = parseInt(gameMode.split('-')[0].slice(0, 1));
+            break;
     }
     timeDisplay.textContent = timeLeft;
+    stopGame();
 }
 
 function startGame() {
@@ -76,6 +73,14 @@ function startGame() {
     startButton.textContent = "Playing...";
     lives = 3;
     livesDisplay.textContent = lives;
+    
+    gameMode = modeSelect.value;
+    
+    if (gameMode === "custom") {
+        customTime = parseInt(customTimeInput.value) || 60;
+        timeLeft = customTime;
+    }
+    
     updateModeDisplayAndTimer();
     
     nextWord();
@@ -90,10 +95,18 @@ function startGame() {
                 handleLifeLoss();
             }
         } else if (timeLeft === 0) {
-            clearInterval(gameInterval);
-            endGame();
+            stopGame();
         }
     }, 1000);
+}
+
+function stopGame() {
+    clearInterval(gameInterval);
+    isPlaying = false;
+    wordInput.disabled = true;
+    startButton.disabled = false;
+    startButton.textContent = "Start Game";
+    resultMessage.textContent = `Game Over! Final Score: ${score} | TPS: ${tps.toFixed(2)}`;
 }
 
 function handleLifeLoss() {
@@ -101,20 +114,11 @@ function handleLifeLoss() {
     livesDisplay.textContent = lives;
 
     if (lives === 0) {
-        clearInterval(gameInterval);
-        endGame();
+        stopGame();
     } else {
-        timeLeft = parseInt(gameMode.split('-')[0]);
+        timeLeft = parseInt(gameMode.split('-')[0].slice(0, 1));
         nextWord();
     }
-}
-
-function endGame() {
-    isPlaying = false;
-    wordInput.disabled = true;
-    startButton.disabled = false;
-    startButton.textContent = "Start Game";
-    resultMessage.textContent = `Game Over! Final Score: ${score} | TPS: ${tps.toFixed(2)}`;
 }
 
 function nextWord() {
@@ -123,7 +127,7 @@ function nextWord() {
 }
 
 function updateTPS() {
-    tps = totalWordsTyped / ((customTime || timeLeft) || 1);
+    tps = totalWordsTyped / (customTime || 60 - timeLeft);
     tpsDisplay.textContent = tps.toFixed(2);
 }
 
@@ -140,6 +144,7 @@ wordInput.addEventListener("input", () => {
 
 startButton.addEventListener("click", startGame);
 modeSelect.addEventListener("change", updateModeDisplayAndTimer);
+
 menuToggle.addEventListener("click", () => {
     sideMenu.style.width = "250px";
 });
