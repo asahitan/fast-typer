@@ -39,35 +39,26 @@ const modeDescriptions = {
 };
 
 function updateModeDisplayAndTimer() {
+    gameMode = modeSelect.value;
     currentModeDisplay.textContent = `Mode: ${modeDescriptions[gameMode]}`;
     
-    switch (gameMode) {
-        case "60s":
-            timeLeft = 60;
-            livesContainer.style.display = "none";
-            customTimeInput.style.display = "none";
-            customTimeLabel.style.display = "none";
-            break;
-        case "10s":
-            timeLeft = 10;
-            livesContainer.style.display = "none";
-            customTimeInput.style.display = "none";
-            customTimeLabel.style.display = "none";
-            break;
-        case "custom":
-            customTimeInput.style.display = "block";
-            customTimeLabel.style.display = "block";
-            customTime = parseInt(customTimeInput.value) || 60;
-            timeLeft = customTime;
-            livesContainer.style.display = "none";
-            break;
-        default:
-            timeLeft = parseInt(gameMode.split('-')[0].slice(0, 1));
-            livesContainer.style.display = "block";
-            customTimeInput.style.display = "none";
-            customTimeLabel.style.display = "none";
-            livesDisplay.textContent = 3;
-            break;
+    if (gameMode === "custom") {
+        customTimeInput.style.display = "block";
+        customTimeLabel.style.display = "block";
+        customTime = parseInt(customTimeInput.value) || 60;
+        timeLeft = customTime;
+        livesContainer.style.display = "none";
+    } else if (gameMode.includes("lives")) {
+        timeLeft = parseInt(gameMode.split('-')[0]);
+        livesContainer.style.display = "block";
+        livesDisplay.textContent = 3;
+        customTimeInput.style.display = "none";
+        customTimeLabel.style.display = "none";
+    } else {
+        timeLeft = parseInt(gameMode);
+        livesContainer.style.display = "none";
+        customTimeInput.style.display = "none";
+        customTimeLabel.style.display = "none";
     }
     timeDisplay.textContent = timeLeft;
 }
@@ -85,14 +76,6 @@ function startGame() {
     startButton.textContent = "Playing...";
     lives = 3;
     livesDisplay.textContent = lives;
-    
-    gameMode = modeSelect.value;
-    
-    if (gameMode === "custom") {
-        customTime = parseInt(customTimeInput.value) || 60;
-        timeLeft = customTime;
-    }
-    
     updateModeDisplayAndTimer();
     
     nextWord();
@@ -121,7 +104,7 @@ function handleLifeLoss() {
         clearInterval(gameInterval);
         endGame();
     } else {
-        timeLeft = parseInt(gameMode.split('-')[0].slice(0, 1));
+        timeLeft = parseInt(gameMode.split('-')[0]);
         nextWord();
     }
 }
@@ -140,7 +123,7 @@ function nextWord() {
 }
 
 function updateTPS() {
-    tps = totalWordsTyped / (customTime || 60 - timeLeft);
+    tps = totalWordsTyped / ((customTime || timeLeft) || 1);
     tpsDisplay.textContent = tps.toFixed(2);
 }
 
@@ -150,28 +133,13 @@ wordInput.addEventListener("input", () => {
         totalWordsTyped++;
         scoreDisplay.textContent = score;
         wordInput.value = "";
-        
-        if (!gameMode.includes("lives") && gameMode !== "custom") {
-            if (gameMode === "60s") {
-                timeLeft = 60;
-            } else if (gameMode === "10s") {
-                timeLeft = 10;
-            } else {
-                timeLeft = parseInt(gameMode);
-            }
-        }
-        
         nextWord();
         updateTPS();
     }
 });
 
 startButton.addEventListener("click", startGame);
-modeSelect.addEventListener("change", () => {
-    gameMode = modeSelect.value;
-    updateModeDisplayAndTimer();
-});
-
+modeSelect.addEventListener("change", updateModeDisplayAndTimer);
 menuToggle.addEventListener("click", () => {
     sideMenu.style.width = "250px";
 });
