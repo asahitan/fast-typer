@@ -42,7 +42,7 @@ const modeDescriptions = {
 // Update Mode Display and Sync Timer
 function updateModeDisplayAndTimer() {
     currentModeDisplay.textContent = `Mode: ${modeDescriptions[gameMode]}`;
-    
+
     switch (gameMode) {
         case "60s":
             timeLeft = 60;
@@ -74,7 +74,7 @@ function updateModeDisplayAndTimer() {
     timeDisplay.textContent = timeLeft;
 }
 
-// Start Game
+// Start or Resume Game
 function startGame() {
     if (isPaused) {
         isPlaying = true;
@@ -98,10 +98,12 @@ function startGame() {
         return;
     }
 
+    // Reset game variables
     score = 0;
     totalWordsTyped = 0;
     tps = 0;
     isPlaying = true;
+    isPaused = false;
     wordInput.value = "";
     resultMessage.textContent = "";
     wordInput.disabled = false;
@@ -110,16 +112,15 @@ function startGame() {
     startButton.textContent = "Playing...";
     lives = 3;
     livesDisplay.textContent = lives;
-    
+
     gameMode = modeSelect.value;
-    
+
     if (gameMode === "custom") {
         customTime = parseInt(customTimeInput.value) || 60;
         timeLeft = customTime;
     }
-    
+
     updateModeDisplayAndTimer();
-    
     nextWord();
 
     gameInterval = setInterval(() => {
@@ -140,9 +141,9 @@ function startGame() {
 
 // Pause Game When Changing Mode
 modeSelect.addEventListener("change", () => {
-    if (isPlaying) {
+    if (isPlaying && !isPaused) {
         isPaused = true;
-        clearInterval(gameInterval);
+        clearInterval(gameInterval); // Stop the timer
         startButton.textContent = "Resume Game";
         startButton.disabled = false;
     }
@@ -205,10 +206,6 @@ wordInput.addEventListener("input", () => {
 
 // Button & Mode Event Listeners
 startButton.addEventListener("click", startGame);
-modeSelect.addEventListener("change", () => {
-    gameMode = modeSelect.value;
-    updateModeDisplayAndTimer();
-});
 
 // Menu & Dark Mode
 menuToggle.addEventListener("click", () => {
